@@ -14,91 +14,91 @@ class SubscriptionTest {
 
     @Test
     void subscriptionEntityToDomain_ShouldReturnNullIfSubscriptionEntityIsNull() {
-        assertNull(SubscriptionEntityMapper.subscriptionEntitytoDomain(null));
+        assertNull(SubscriptionEntityMapper.subscriptionEntityToDomain(null));
     }
 
     @Test
-    void subscriptionEntityToDomain_ShouldReturnSubscriptionWhenEntityIsNotNull() {
-        LocalDateTime lDate = LocalDateTime.of(2026, 3, 10, 12, 30);
+    void subscriptionEntityToDomain_ShouldReturnSubscriptionDomainWhenSubscriptionEntityAndOptionEntityAreNotNull() {
+        LocalDateTime newDate = LocalDateTime.of(2026, 3, 10, 12, 30);
 
-        OptionEntity lOptionEntity = new OptionEntity();
-        lOptionEntity.setOptionType(OptionType.NETFLIX);
-        lOptionEntity.setOptionSubDateStart(lDate);
+        OptionEntity optionEntity = new OptionEntity();
+        optionEntity.setOptionType(OptionType.NETFLIX);
+        optionEntity.setOptionSubDateStart(newDate);
 
-        SubscriptionEntity lSubscriptionEntity = new SubscriptionEntity();
-        lSubscriptionEntity.setId(1L);
-        lSubscriptionEntity.setClientId(2L);
-        lSubscriptionEntity.setType(SubscriptionType.FIBER);
-        lSubscriptionEntity.setSubscriptionDateStart(lDate);
-        lSubscriptionEntity.setOptionsList(List.of(lOptionEntity));
+        SubscriptionEntity subscriptionEntity = new SubscriptionEntity();
+        subscriptionEntity.setId(1L);
+        subscriptionEntity.setClientId(2L);
+        subscriptionEntity.setType(SubscriptionType.FIBER);
+        subscriptionEntity.setSubscriptionDateStart(newDate);
+        subscriptionEntity.setOptionsList(List.of(optionEntity));
 
-        Subscription lSubscription = SubscriptionEntityMapper.subscriptionEntitytoDomain(lSubscriptionEntity);
+        Subscription subscriptionDomain = SubscriptionEntityMapper.subscriptionEntityToDomain(subscriptionEntity);
 
-        assertNotNull(lSubscription);
-        assertEquals(1L, lSubscription.getId());
-        assertEquals(2L, lSubscription.getClientId());
-        assertEquals(SubscriptionType.FIBER, lSubscription.getType());
-        assertEquals(lDate, lSubscription.getSubscriptionDateStart());
-        assertEquals(1, lSubscription.getOptionsList().size());
-        assertEquals(OptionType.NETFLIX, lSubscription.getOptionsList().getFirst().getOptionType());
+        assertNotNull(subscriptionDomain);
+        assertEquals(1L, subscriptionDomain.getId());
+        assertEquals(2L, subscriptionDomain.getClientId());
+        assertEquals(SubscriptionType.FIBER, subscriptionDomain.getType());
+        assertEquals(newDate, subscriptionDomain.getSubscriptionDateStart());
+        assertEquals(1, subscriptionDomain.getOptionsList().size());
+        assertEquals(OptionType.NETFLIX, subscriptionDomain.getOptionsList().getFirst().getOptionType());
     }
 
     @Test
-    void subscriptionDomainToEntity_ShouldReturnNullIfSubscriptionIsNull() {
-        assertNull(SubscriptionEntityMapper.subscriptionDomaintoEntity(null));
+    void subscriptionDomainToEntity_ShouldReturnNullIfSubscriptionDomainIsNull() {
+        assertNull(SubscriptionEntityMapper.subscriptionDomainToEntity(null));
     }
 
     @Test
-    void subscriptionDomainToEntity_ShouldReturnSubscriptionEntity() {
-        LocalDateTime lDate = LocalDateTime.of(2026, 3, 10, 12, 30);
+    void subscriptionDomainToEntity_ShouldReturnSubscriptionEntityWhenSubscriptionDomainIsNotNull() {
+        LocalDateTime newDate = LocalDateTime.of(2026, 3, 10, 12, 30);
 
-        Subscription lSubscription = new Subscription();
-        lSubscription.setId(1L);
-        lSubscription.setClientId(2L);
-        lSubscription.setType(SubscriptionType.FIBER);
-        lSubscription.setSubscriptionDateStart(lDate);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setId(1L);
+        subscriptionDomain.setClientId(2L);
+        subscriptionDomain.setType(SubscriptionType.FIBER);
+        subscriptionDomain.setSubscriptionDateStart(newDate);
 
-        SubscriptionEntity lSubscriptionEntity = SubscriptionEntityMapper.subscriptionDomaintoEntity(lSubscription);
+        SubscriptionEntity subscriptionEntity = SubscriptionEntityMapper.subscriptionDomainToEntity(subscriptionDomain);
 
-        assertNotNull(lSubscriptionEntity);
-        assertEquals(1L, lSubscriptionEntity.getId());
-        assertEquals(2L, lSubscriptionEntity.getClientId());
-        assertEquals(SubscriptionType.FIBER, lSubscriptionEntity.getType());
-        assertEquals(lDate, lSubscriptionEntity.getSubscriptionDateStart());
+        assertNotNull(subscriptionEntity);
+        assertEquals(1L, subscriptionEntity.getId());
+        assertEquals(2L, subscriptionEntity.getClientId());
+        assertEquals(SubscriptionType.FIBER, subscriptionEntity.getType());
+        assertEquals(newDate, subscriptionEntity.getSubscriptionDateStart());
     }
 
     @Test
-    void subscriptionDomainToEntity_ShouldReturnEntityWithOptions() {
-        LocalDateTime lDate = LocalDateTime.of(2026, 3, 10, 12, 30);
+    void subscriptionDomainToEntity_ShouldReturnEntityWithOptionsWhenSubscriptionDomainAndOptionDomainAreNotNull() {
+        LocalDateTime newDate = LocalDateTime.of(2026, 3, 10, 12, 30);
 
-        Option lOption = new Option();
-        lOption.setId(1L);
-        lOption.setOptionType(OptionType.NETFLIX);
-        lOption.setOptionSubDateStart(lDate);
+        Option optionDomain = new Option();
+        optionDomain.setId(1L);
+        optionDomain.setOptionType(OptionType.NETFLIX);
+        optionDomain.setOptionSubDateStart(newDate);
 
-        Subscription lSubscription = new Subscription();
-        lSubscription.setId(1L);
-        lSubscription.setType(SubscriptionType.FIBER);
-        lSubscription.setSubscriptionDateStart(lDate);
-        lSubscription.setOptionList(List.of(lOption));
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setId(1L);
+        subscriptionDomain.setType(SubscriptionType.FIBER);
+        subscriptionDomain.setSubscriptionDateStart(newDate);
+        subscriptionDomain.setOptionList(List.of(optionDomain));
 
-        SubscriptionEntity lSubscriptionEntity = SubscriptionEntityMapper.subscriptionDomaintoEntity(lSubscription);
+        SubscriptionEntity subscriptionEntity = SubscriptionEntityMapper.subscriptionDomainToEntity(subscriptionDomain);
 
-        assertNotNull(lSubscriptionEntity);
-        assertEquals(1, lSubscriptionEntity.getOptionsList().size());
-        assertEquals(OptionType.NETFLIX, lSubscriptionEntity.getOptionsList().getFirst().getOptionType());
+        assertNotNull(subscriptionEntity);
+        assertEquals(1, subscriptionEntity.getOptionsList().size());
+        assertEquals(OptionType.NETFLIX, subscriptionEntity.getOptionsList().getFirst().getOptionType());
     }
 
     @Test
     void subscriptionDomainToEntity_ShouldNotSetOptionsWhenOptionsListIsNull() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(42L);
-        lSubscription.setType(SubscriptionType.MOBILE);
-        lSubscription.setOptionList(null);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(42L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
+        subscriptionDomain.setOptionList(null);
 
-        SubscriptionEntity lSubscriptionEntity = SubscriptionEntityMapper.subscriptionDomaintoEntity(lSubscription);
+        SubscriptionEntity subscriptionEntity = SubscriptionEntityMapper.subscriptionDomainToEntity(subscriptionDomain);
 
-        assertNotNull(lSubscriptionEntity);
-        assertTrue(lSubscriptionEntity.getOptionsList().isEmpty());
+        assertNotNull(subscriptionEntity);
+        assertTrue(subscriptionEntity.getOptionsList().isEmpty());
     }
 }

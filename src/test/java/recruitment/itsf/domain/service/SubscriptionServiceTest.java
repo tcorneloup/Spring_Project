@@ -1,7 +1,7 @@
 package recruitment.itsf.domain.service;
 
 import recruitment.itsf.domain.exception.DomainException;
-import recruitment.itsf.domain.repository.SubscriptionRepository;
+import recruitment.itsf.domain.repository.SubscriptionRepositoryDomain;
 import recruitment.itsf.domain.model.Option;
 import recruitment.itsf.domain.model.OptionType;
 import recruitment.itsf.domain.model.Subscription;
@@ -25,288 +25,288 @@ import static org.mockito.Mockito.*;
 class SubscriptionServiceTest {
 
     @Mock
-    private SubscriptionRepository subscriptionRepository;
+    private SubscriptionRepositoryDomain subscriptionRepositoryDomain;
 
     @InjectMocks
     private SubscriptionService subscriptionService;
 
     @Test
     void getSubscriptionById_shouldThrowDomainExceptionWhenNotFound() {
-        when(subscriptionRepository.findById(any())).thenReturn(Optional.empty());
+        when(subscriptionRepositoryDomain.findById(any())).thenReturn(Optional.empty());
 
-        DomainException exception = assertThrows(DomainException.class,
+        DomainException domainException = assertThrows(DomainException.class,
                 () -> subscriptionService.getSubscriptionById(999L));
 
-        assertEquals("subscription.isNull", exception.getMessage());
+        assertEquals("subscription.isNull", domainException.getMessage());
     }
 
     @Test
-    void findAllSubscriptionsWithOptions_shouldReturnSubscriptionsIfThereAreSome() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.FIBER);
-        lSubscription.setSubscriptionDateStart(LocalDateTime.now());
+    void findAllSubscriptionsWithOptions_shouldReturnSubscriptionsDomainListIfThereAreSome() {
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.FIBER);
+        subscriptionDomain.setSubscriptionDateStart(LocalDateTime.now());
 
-        Option lOption = new Option();
-        lOption.setOptionType(OptionType.NETFLIX);
-        lSubscription.setOptionList(new java.util.ArrayList<>(List.of(lOption)));
+        Option optionDomain = new Option();
+        optionDomain.setOptionType(OptionType.NETFLIX);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>(List.of(optionDomain)));
 
-        when(subscriptionRepository.findAllSubscriptionsWithOptions())
-                .thenReturn(List.of(lSubscription));
+        when(subscriptionRepositoryDomain.findAllSubscriptionsWithOptions())
+                .thenReturn(List.of(subscriptionDomain));
 
-        List<Subscription> lResult = subscriptionService.findAllSubscriptionsWithOptions();
+        List<Subscription> subscriptionsDomainList = subscriptionService.findAllSubscriptionsWithOptions();
 
-        assertEquals(1, lResult.size());
-        assertNotNull(lResult.getFirst());
-        verify(subscriptionRepository).findAllSubscriptionsWithOptions();
+        assertEquals(1, subscriptionsDomainList.size());
+        assertNotNull(subscriptionsDomainList.getFirst());
+        verify(subscriptionRepositoryDomain).findAllSubscriptionsWithOptions();
     }
 
     @Test
-    void findAllSubscriptionsWithOptions_shouldReturnEmptyListIfThereIsNoSubscriptions() {
-        when(subscriptionRepository.findAllSubscriptionsWithOptions())
+    void findAllSubscriptionsWithOptions_shouldReturnEmptyListIfThereIsNoSubscriptionsDomain() {
+        when(subscriptionRepositoryDomain.findAllSubscriptionsWithOptions())
                 .thenReturn(Collections.emptyList());
 
-        List<Subscription> lResult = subscriptionService.findAllSubscriptionsWithOptions();
+        List<Subscription> subscriptionsDomainList = subscriptionService.findAllSubscriptionsWithOptions();
 
-        assertNotNull(lResult);
-        assertTrue(lResult.isEmpty());
-        verify(subscriptionRepository).findAllSubscriptionsWithOptions();
+        assertNotNull(subscriptionsDomainList);
+        assertTrue(subscriptionsDomainList.isEmpty());
+        verify(subscriptionRepositoryDomain).findAllSubscriptionsWithOptions();
     }
 
     @Test
     void addNewSubscription_shouldThrowDomainExceptionWhenClientIdIsNull() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(null);
-        lSubscription.setType(SubscriptionType.MOBILE);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(null);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addNewSubscription(lSubscription));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addNewSubscription(subscriptionDomain));
 
-        assertEquals("subscription.clientId.required", e.getErrorCode());
+        assertEquals("subscription.clientId.required", domainException.getErrorCode());
     }
 
     @Test
     void addNewSubscription_shouldThrowDomainExceptionWhenSubTypeIsNull() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(null);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(null);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addNewSubscription(lSubscription));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addNewSubscription(subscriptionDomain));
 
-        assertEquals("subscription.type.required", e.getErrorCode());
+        assertEquals("subscription.type.required", domainException.getErrorCode());
     }
 
     @Test
-    void addNewSubscription_shouldReturnSubscriptionWhenValid() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.MOBILE);
+    void addNewSubscription_shouldReturnSubscriptionDomainWhenValid() {
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
 
-        Subscription lSavedSub = mock(Subscription.class);
-        when(subscriptionRepository.save(any(Subscription.class))).thenReturn(lSavedSub);
+        Subscription savedSubscriptionDomain = mock(Subscription.class);
+        when(subscriptionRepositoryDomain.save(any(Subscription.class))).thenReturn(savedSubscriptionDomain);
 
-        Subscription lNewSub = subscriptionService.addNewSubscription(lSubscription);
+        Subscription newSubscriptionDomain = subscriptionService.addNewSubscription(subscriptionDomain);
 
-        assertSame(lSavedSub, lNewSub);
-        verify(subscriptionRepository).save(any(Subscription.class));
+        assertSame(savedSubscriptionDomain, newSubscriptionDomain);
+        verify(subscriptionRepositoryDomain).save(any(Subscription.class));
     }
 
     @Test
-    void addOptionToExistingSubscription_shouldThrowDomainExceptionWhenOptionTypeIsNull() {
+    void addOptionToExistingSubscription_shouldThrowDomainExceptionWhenOptionsTypeIsNull() {
 
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.MOBILE);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addOptionToExistingSubscription(lSubscription, null));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addOptionsToExistingSubscription(subscriptionDomain, null));
 
-        assertEquals("option.isNull", e.getErrorCode());
+        assertEquals("option.isNull", domainException.getErrorCode());
     }
 
     @Test
-    void addOptionToExistingSubscription_shouldReturnSubscriptionWhenOptionTypeIsValid() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.FIBER);
+    void addOptionToExistingSubscription_shouldReturnSubscriptionDomainWhenOptionsTypeIsValid() {
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.FIBER);
 
-        Subscription lSavedSub = mock(Subscription.class);
-        when(subscriptionRepository.save(any(Subscription.class))).thenReturn(lSavedSub);
+        Subscription savedSubscriptionDomain = mock(Subscription.class);
+        when(subscriptionRepositoryDomain.save(any(Subscription.class))).thenReturn(savedSubscriptionDomain);
 
-        Subscription lNewSub = subscriptionService.addOptionToExistingSubscription(lSubscription, OptionType.NETFLIX);
+        Subscription newSubscriptionDomain = subscriptionService.addOptionsToExistingSubscription(subscriptionDomain, OptionType.NETFLIX);
 
-        assertSame(lSavedSub, lNewSub);
-        verify(subscriptionRepository).save(any(Subscription.class));
+        assertSame(savedSubscriptionDomain, newSubscriptionDomain);
+        verify(subscriptionRepositoryDomain).save(any(Subscription.class));
     }
 
     @Test
     void manageOptions_shouldThrowDomainExceptionWhenOptionTypeIsNull() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.MOBILE);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
 
-        Option lOption = new Option();
-        lOption.setOptionType(null);
+        Option optionDomain = new Option();
+        optionDomain.setOptionType(null);
 
-        lSubscription.setOptionList(new java.util.ArrayList<>());
-        lSubscription.getOptionsList().add(lOption);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>());
+        subscriptionDomain.getOptionsList().add(optionDomain);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addNewSubscription(lSubscription));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addNewSubscription(subscriptionDomain));
 
-        assertEquals("option.isNull", e.getErrorCode());
+        assertEquals("option.isNull", domainException.getErrorCode());
     }
 
     @Test
     void manageOptions_shouldThrowDomainExceptionWhenOptionAlreadyExists() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.MOBILE);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
 
-        Option lOption1 = new Option();
-        lOption1.setOptionType(OptionType.ROAMING);
+        Option optionDomain1 = new Option();
+        optionDomain1.setOptionType(OptionType.ROAMING);
 
-        Option lOption2 = new Option();
-        lOption2.setOptionType(OptionType.ROAMING);
+        Option optionDomain2 = new Option();
+        optionDomain2.setOptionType(OptionType.ROAMING);
 
-        lSubscription.setOptionList(new java.util.ArrayList<>());
-        lSubscription.getOptionsList().add(lOption1);
-        lSubscription.getOptionsList().add(lOption2);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>());
+        subscriptionDomain.getOptionsList().add(optionDomain1);
+        subscriptionDomain.getOptionsList().add(optionDomain2);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addNewSubscription(lSubscription));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addNewSubscription(subscriptionDomain));
 
-        assertEquals("option.already.exists", e.getErrorCode());
+        assertEquals("option.already.exists", domainException.getErrorCode());
     }
 
     @Test
     void manageOptions_shouldThrowDomainExceptionWhenRoamingWithoutMobile() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.FIX);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.FIX);
 
-        Option lOption = new Option();
-        lOption.setOptionType(OptionType.ROAMING);
+        Option optionDomain = new Option();
+        optionDomain.setOptionType(OptionType.ROAMING);
 
-        lSubscription.setOptionList(new java.util.ArrayList<>());
-        lSubscription.getOptionsList().add(lOption);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>());
+        subscriptionDomain.getOptionsList().add(optionDomain);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addNewSubscription(lSubscription));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addNewSubscription(subscriptionDomain));
 
-        assertEquals("option.roaming.not.allowed", e.getErrorCode());
+        assertEquals("option.roaming.not.allowed", domainException.getErrorCode());
     }
 
     @Test
     void manageOptions_shouldThrowDomainExceptionWhenNetflixWithoutFiber() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.MOBILE);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
 
-        Option lOption = new Option();
-        lOption.setOptionType(OptionType.NETFLIX);
+        Option optionDomain = new Option();
+        optionDomain.setOptionType(OptionType.NETFLIX);
 
-        lSubscription.setOptionList(new java.util.ArrayList<>());
-        lSubscription.getOptionsList().add(lOption);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>());
+        subscriptionDomain.getOptionsList().add(optionDomain);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addNewSubscription(lSubscription));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addNewSubscription(subscriptionDomain));
 
-        assertEquals("option.netflix.not.allowed", e.getErrorCode());
+        assertEquals("option.netflix.not.allowed", domainException.getErrorCode());
     }
 
     @Test
     void manageOptions_shouldThrowDomainExceptionWhenHDWithoutNetflix() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.MOBILE);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
 
-        Option lOption = new Option();
-        lOption.setOptionType(OptionType.ROAMING);
+        Option optionDomain = new Option();
+        optionDomain.setOptionType(OptionType.ROAMING);
 
-        Option lOption2 = new Option();
-        lOption2.setOptionType(OptionType.HD);
+        Option optionDomain2 = new Option();
+        optionDomain2.setOptionType(OptionType.HD);
 
-        lSubscription.setOptionList(new java.util.ArrayList<>());
-        lSubscription.getOptionsList().add(lOption);
-        lSubscription.getOptionsList().add(lOption2);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>());
+        subscriptionDomain.getOptionsList().add(optionDomain);
+        subscriptionDomain.getOptionsList().add(optionDomain2);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addNewSubscription(lSubscription));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addNewSubscription(subscriptionDomain));
 
-        assertEquals("option.hd.requires.netflix", e.getErrorCode());
+        assertEquals("option.hd.requires.netflix", domainException.getErrorCode());
     }
 
     @Test
     void manageOptions_shouldThrowDomainExceptionWhenMusicWithFix() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.FIX);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.FIX);
 
-        Option lOption = new Option();
-        lOption.setOptionType(OptionType.MUSIC);
+        Option optionDomain = new Option();
+        optionDomain.setOptionType(OptionType.MUSIC);
 
-        lSubscription.setOptionList(new java.util.ArrayList<>());
-        lSubscription.getOptionsList().add(lOption);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>());
+        subscriptionDomain.getOptionsList().add(optionDomain);
 
-        DomainException e = assertThrows(DomainException.class,
-                () -> subscriptionService.addNewSubscription(lSubscription));
+        DomainException domainException = assertThrows(DomainException.class,
+                () -> subscriptionService.addNewSubscription(subscriptionDomain));
 
-        assertEquals("option.music.not.allowed", e.getErrorCode());
+        assertEquals("option.music.not.allowed", domainException.getErrorCode());
     }
 
     @Test
     void manageOptions_shouldSaveWhenRoamingAndMusicWithMobile() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.MOBILE);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
 
-        Option lOption = new Option();
-        lOption.setOptionType(OptionType.MUSIC);
+        Option optionDomain = new Option();
+        optionDomain.setOptionType(OptionType.MUSIC);
 
-        Option lOption2 = new Option();
-        lOption2.setOptionType(OptionType.ROAMING);
+        Option optionDomain2 = new Option();
+        optionDomain2.setOptionType(OptionType.ROAMING);
 
-        lSubscription.setOptionList(new java.util.ArrayList<>());
-        lSubscription.getOptionsList().add(lOption);
-        lSubscription.getOptionsList().add(lOption2);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>());
+        subscriptionDomain.getOptionsList().add(optionDomain);
+        subscriptionDomain.getOptionsList().add(optionDomain2);
 
-        Subscription lSavedSub = mock(Subscription.class);
-        when(subscriptionRepository.save(any(Subscription.class))).thenReturn(lSavedSub);
+        Subscription savedSubcriptionDomain = mock(Subscription.class);
+        when(subscriptionRepositoryDomain.save(any(Subscription.class))).thenReturn(savedSubcriptionDomain);
 
-        Subscription lNewSub = subscriptionService.addNewSubscription(lSubscription);
+        Subscription newSubscriptionDomain = subscriptionService.addNewSubscription(subscriptionDomain);
 
-        assertSame(lSavedSub, lNewSub);
-        verify(subscriptionRepository).save(any(Subscription.class));
+        assertSame(savedSubcriptionDomain, newSubscriptionDomain);
+        verify(subscriptionRepositoryDomain).save(any(Subscription.class));
     }
 
     @Test
     void manageOptions_shouldSaveWhenNetflixAndMusicAndHDWithFiber() {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.FIBER);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.FIBER);
 
-        Option lOption = new Option();
-        lOption.setOptionType(OptionType.NETFLIX);
+        Option optionDomain = new Option();
+        optionDomain.setOptionType(OptionType.NETFLIX);
 
-        Option lOption2 = new Option();
-        lOption2.setOptionType(OptionType.MUSIC);
+        Option optionDomain2 = new Option();
+        optionDomain2.setOptionType(OptionType.MUSIC);
 
-        Option lOption3 = new Option();
-        lOption3.setOptionType(OptionType.HD);
+        Option optionDomain3 = new Option();
+        optionDomain3.setOptionType(OptionType.HD);
 
-        lSubscription.setOptionList(new java.util.ArrayList<>());
-        lSubscription.getOptionsList().add(lOption);
-        lSubscription.getOptionsList().add(lOption2);
-        lSubscription.getOptionsList().add(lOption3);
+        subscriptionDomain.setOptionList(new java.util.ArrayList<>());
+        subscriptionDomain.getOptionsList().add(optionDomain);
+        subscriptionDomain.getOptionsList().add(optionDomain2);
+        subscriptionDomain.getOptionsList().add(optionDomain3);
 
-        Subscription lSavedSub = mock(Subscription.class);
-        when(subscriptionRepository.save(any(Subscription.class))).thenReturn(lSavedSub);
+        Subscription savedSubscriptionDomain = mock(Subscription.class);
+        when(subscriptionRepositoryDomain.save(any(Subscription.class))).thenReturn(savedSubscriptionDomain);
 
-        Subscription lNewSub = subscriptionService.addNewSubscription(lSubscription);
+        Subscription newSubscriptionDomain = subscriptionService.addNewSubscription(subscriptionDomain);
 
-        assertSame(lSavedSub, lNewSub);
-        verify(subscriptionRepository).save(any(Subscription.class));
+        assertSame(savedSubscriptionDomain, newSubscriptionDomain);
+        verify(subscriptionRepositoryDomain).save(any(Subscription.class));
     }
 }

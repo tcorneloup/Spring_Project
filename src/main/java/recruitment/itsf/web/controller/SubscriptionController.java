@@ -24,23 +24,23 @@ public class SubscriptionController {
 
     @GetMapping
     public ResponseEntity<List<SubscriptionResponse>> findAllSubscriptions() {
-        List<Subscription> subscriptions = subscriptionService.findAllSubscriptionsWithOptions();
+        List<Subscription> subscriptionsListDomain = subscriptionService.findAllSubscriptionsWithOptions();
 
-        List<SubscriptionResponse> subscriptionsResponse = subscriptions.stream()
+        List<SubscriptionResponse> subscriptionsListResponse = subscriptionsListDomain.stream()
                 .map(SubscriptionDtoMapper::subscriptionDomainToResponse)
                 .toList();
 
-        return ResponseEntity.ok(subscriptionsResponse);
+        return ResponseEntity.ok(subscriptionsListResponse);
     }
 
     @PostMapping()
     public ResponseEntity<SubscriptionResponse> newSubscription(@Valid @RequestBody SubscriptionRequest request) {
-        Subscription subscriptionToSave = SubscriptionDtoMapper.subscriptionRequestToDomain(request);
+        Subscription subscriptionDomainToSave = SubscriptionDtoMapper.subscriptionRequestToDomain(request);
 
-        Subscription savedSubscription = subscriptionService.addNewSubscription(subscriptionToSave);
+        Subscription savedSubscriptionDomain = subscriptionService.addNewSubscription(subscriptionDomainToSave);
 
-        SubscriptionResponse response = SubscriptionDtoMapper.subscriptionDomainToResponse(savedSubscription);
-        return ResponseEntity.ok(response);
+        SubscriptionResponse SubscriptionResponse = SubscriptionDtoMapper.subscriptionDomainToResponse(savedSubscriptionDomain);
+        return ResponseEntity.ok(SubscriptionResponse);
     }
 
     @PostMapping("/{id}/options/{option}")
@@ -48,11 +48,11 @@ public class SubscriptionController {
             @PathVariable("id") Long id,
             @PathVariable("option") OptionType optionType) {
 
-        Subscription subscriptionToUpdate = subscriptionService.getSubscriptionById(id);
+        Subscription subscriptionDomainToUpdate = subscriptionService.getSubscriptionById(id);
 
-        Subscription updatedSubscription = subscriptionService.addOptionToExistingSubscription(subscriptionToUpdate, optionType);
+        Subscription updatedSubscriptionDomain = subscriptionService.addOptionsToExistingSubscription(subscriptionDomainToUpdate, optionType);
 
-        SubscriptionResponse response = SubscriptionDtoMapper.subscriptionDomainToResponse(updatedSubscription);
-        return ResponseEntity.ok(response);
+        SubscriptionResponse subscriptionResponse = SubscriptionDtoMapper.subscriptionDomainToResponse(updatedSubscriptionDomain);
+        return ResponseEntity.ok(subscriptionResponse);
     }
 }

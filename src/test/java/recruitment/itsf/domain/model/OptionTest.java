@@ -16,41 +16,41 @@ class OptionTest {
     }
 
     @Test
-    void optionEntityToDomain_ShouldReturnOptionWhenOptionEntityIsNotNull() {
-        LocalDateTime lDate = LocalDateTime.of(2026, 3, 10, 12, 30);
+    void optionEntityToDomain_ShouldReturnOptionDomainWhenOptionEntityIsNotNull() {
+        LocalDateTime newDate = LocalDateTime.of(2026, 3, 10, 12, 30);
 
-        OptionEntity lOptionEntity = new OptionEntity();
-        lOptionEntity.setId(1L);
-        lOptionEntity.setOptionType(OptionType.NETFLIX);
-        lOptionEntity.setOptionSubDateStart(lDate);
+        OptionEntity optionEntity = new OptionEntity();
+        optionEntity.setId(1L);
+        optionEntity.setOptionType(OptionType.NETFLIX);
+        optionEntity.setOptionSubDateStart(newDate);
 
-        Option lOption = SubscriptionEntityMapper.optionEntityToDomain(lOptionEntity);
+        Option optionDomain = SubscriptionEntityMapper.optionEntityToDomain(optionEntity);
 
-        assertNotNull(lOption);
-        assertEquals(1L, lOption.getId());
-        assertEquals(OptionType.NETFLIX, lOption.getOptionType());
-        assertEquals(lDate, lOption.getOptionSubDateStart());
+        assertNotNull(optionDomain);
+        assertEquals(1L, optionDomain.getId());
+        assertEquals(OptionType.NETFLIX, optionDomain.getOptionType());
+        assertEquals(newDate, optionDomain.getOptionSubDateStart());
     }
 
     @Test
-    void optionDomainToEntity_ShouldReturnNullIfOptionIsNull() {
+    void optionDomainToEntity_ShouldReturnNullIfOptionDomainIsNull() {
         assertNull(SubscriptionEntityMapper.optionDomainToEntity(null));
     }
 
     @Test
-    void optionDomainToEntity_ShouldReturnOptionEntity() {
-        LocalDateTime lDate = LocalDateTime.of(2026, 3, 10, 12, 30);
+    void optionDomainToEntity_ShouldReturnOptionEntityWhenOptionDomainIsNotNull() {
+        LocalDateTime newDate = LocalDateTime.of(2026, 3, 10, 12, 30);
 
-        Option lOption = new Option();
-        lOption.setId(1L);
-        lOption.setOptionType(OptionType.NETFLIX);
-        lOption.setOptionSubDateStart(lDate);
+        Option optionDomain = new Option();
+        optionDomain.setId(1L);
+        optionDomain.setOptionType(OptionType.NETFLIX);
+        optionDomain.setOptionSubDateStart(newDate);
 
-        OptionEntity lOptionEntity = SubscriptionEntityMapper.optionDomainToEntity(lOption);
+        OptionEntity optionEntity = SubscriptionEntityMapper.optionDomainToEntity(optionDomain);
 
-        assertNotNull(lOptionEntity);
-        assertEquals(1L, lOptionEntity.getId());
-        assertEquals(OptionType.NETFLIX, lOptionEntity.getOptionType());
-        assertEquals(lDate, lOptionEntity.getOptionSubDateStart());
+        assertNotNull(optionEntity);
+        assertEquals(1L, optionEntity.getId());
+        assertEquals(OptionType.NETFLIX, optionEntity.getOptionType());
+        assertEquals(newDate, optionEntity.getOptionSubDateStart());
     }
 }

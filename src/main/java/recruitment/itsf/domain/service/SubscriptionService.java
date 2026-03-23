@@ -1,7 +1,7 @@
 package recruitment.itsf.domain.service;
 
 import recruitment.itsf.domain.exception.DomainException;
-import recruitment.itsf.domain.repository.SubscriptionRepository;
+import recruitment.itsf.domain.repository.SubscriptionRepositoryDomain;
 import recruitment.itsf.domain.model.Option;
 import recruitment.itsf.domain.model.OptionType;
 import recruitment.itsf.domain.model.Subscription;
@@ -19,99 +19,99 @@ public class SubscriptionService {
     
     private static final Logger log = LoggerFactory.getLogger(SubscriptionService.class);
 
-    private final SubscriptionRepository subscriptionRepository;
+    private final SubscriptionRepositoryDomain subscriptionRepositoryDomain;
 
-    public SubscriptionService(SubscriptionRepository subscriptionRepository) {
-        this.subscriptionRepository = subscriptionRepository;
+    public SubscriptionService(SubscriptionRepositoryDomain subscriptionRepositoryDomain) {
+        this.subscriptionRepositoryDomain = subscriptionRepositoryDomain;
     }
 
     @Transactional
-    public Subscription addNewSubscription(Subscription newSubscription) {
+    public Subscription addNewSubscription(Subscription newSubscriptionDomain) {
 
-        if (newSubscription.getClientId() == null) {
+        if (newSubscriptionDomain.getClientId() == null) {
             log.warn(ErrorCodes.SUBSCRIPTION_CLIENT_ID_REQUIRED);
             throw new DomainException(ErrorCodes.SUBSCRIPTION_CLIENT_ID_REQUIRED);
         }
 
-        if (newSubscription.getType() == null) {
+        if (newSubscriptionDomain.getType() == null) {
             log.warn(ErrorCodes.SUBSCRIPTION_TYPE_REQUIRED);
             throw new DomainException(ErrorCodes.SUBSCRIPTION_TYPE_REQUIRED);
         }
-        newSubscription.setSubscriptionDateStart(LocalDateTime.now());
+        newSubscriptionDomain.setSubscriptionDateStart(LocalDateTime.now());
         
-        List<Option> lOptionsList = newSubscription.getOptionsList();
-        for (Option option : lOptionsList) {
-            manageOptions(newSubscription, option);
+        List<Option> optionsDomainListToAdd = newSubscriptionDomain.getOptionsList();
+        for (Option optionsDomain : optionsDomainListToAdd) {
+            manageOptions(newSubscriptionDomain, optionsDomain);
         }
 
-        return subscriptionRepository.save(newSubscription);
+        return subscriptionRepositoryDomain.save(newSubscriptionDomain);
     }
 
     @Transactional
-    public Subscription addOptionToExistingSubscription(Subscription subscriptionToAddNewOption, OptionType optionTypeToAdd) {
+    public Subscription addOptionsToExistingSubscription(Subscription subscriptionDomainToAddNewOption, OptionType optionTypeToAdd) {
 
-        Option newOption = new Option();
-        newOption.setOptionType(optionTypeToAdd);
-        newOption.setOptionSubDateStart(LocalDateTime.now());
+        Option newOptionDomain = new Option();
+        newOptionDomain.setOptionType(optionTypeToAdd);
+        newOptionDomain.setOptionSubDateStart(LocalDateTime.now());
         
-        manageOptions(subscriptionToAddNewOption, newOption);
+        manageOptions(subscriptionDomainToAddNewOption, newOptionDomain);
 
-        subscriptionToAddNewOption.getOptionsList().add(newOption);
+        subscriptionDomainToAddNewOption.getOptionsList().add(newOptionDomain);
         
-        return subscriptionRepository.save(subscriptionToAddNewOption);
+        return subscriptionRepositoryDomain.save(subscriptionDomainToAddNewOption);
     }
     
     @Transactional(readOnly = true)
     public Subscription getSubscriptionById(Long pId) {
-        return subscriptionRepository.findById(pId)
+        return subscriptionRepositoryDomain.findById(pId)
                 .orElseThrow(() -> new DomainException(ErrorCodes.SUBSCRIPTION_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public List<Subscription> findAllSubscriptionsWithOptions() {
-        return subscriptionRepository.findAllSubscriptionsWithOptions();
+        return subscriptionRepositoryDomain.findAllSubscriptionsWithOptions();
     }
     
-    private void manageOptions(Subscription subscriptionToManage, Option optionToManage) {
-        OptionType lOptionType = optionToManage.getOptionType();
+    private void manageOptions(Subscription subscriptionDomainToManage, Option optionDomainToManage) {
+        OptionType getOptionType = optionDomainToManage.getOptionType();
 
-        if (optionToManage.getOptionSubDateStart() == null) {
-            optionToManage.setOptionSubDateStart(LocalDateTime.now());
+        if (optionDomainToManage.getOptionSubDateStart() == null) {
+            optionDomainToManage.setOptionSubDateStart(LocalDateTime.now());
         }
 
-        if (lOptionType == null) {
+        if (getOptionType == null) {
             log.warn(ErrorCodes.OPTION_TYPE_NULL);
             throw new DomainException(ErrorCodes.OPTION_TYPE_NULL);
         }
 
-        boolean optionAlreadyExistsInThisSubscription = subscriptionToManage.getOptionsList().stream()
-                .filter(option -> option != optionToManage)
-                .anyMatch(option -> option.getOptionType() == lOptionType);
+        boolean optionAlreadyExistsInThisSubscription = subscriptionDomainToManage.getOptionsList().stream()
+                .filter(option -> option != optionDomainToManage)
+                .anyMatch(option -> option.getOptionType() == getOptionType);
 
         if (optionAlreadyExistsInThisSubscription) {
-            log.warn("Option {} is already added for this subscription {}", lOptionType, subscriptionToManage.getId());
+            log.warn("Option {} is already added for this subscription {}", getOptionType, subscriptionDomainToManage.getId());
             throw new DomainException(ErrorCodes.OPTION_ALREADY_EXISTS);
         }
 
-        checkOptionToAddInTheSubscription(subscriptionToManage, lOptionType);
+        checkOptionsToAddInTheSubscription(subscriptionDomainToManage, getOptionType);
     }
 
-    private void checkOptionToAddInTheSubscription(Subscription subscriptionToManage, OptionType lOptionType) {
-        switch (lOptionType) {
+    private void checkOptionsToAddInTheSubscription(Subscription subscriptionDomainToManage, OptionType optionTypeToAdd) {
+        switch (optionTypeToAdd) {
             case ROAMING -> {
-                if (subscriptionToManage.getType() != (SubscriptionType.MOBILE)) {
+                if (subscriptionDomainToManage.getType() != (SubscriptionType.MOBILE)) {
                     log.warn(ErrorCodes.OPTION_ROAMING_NOT_ALLOWED);
                     throw new DomainException(ErrorCodes.OPTION_ROAMING_NOT_ALLOWED);
                 }
             }
             case NETFLIX -> {
-                if (subscriptionToManage.getType() != (SubscriptionType.FIBER)) {
+                if (subscriptionDomainToManage.getType() != (SubscriptionType.FIBER)) {
                     log.warn(ErrorCodes.OPTION_NETFLIX_NOT_ALLOWED);
                     throw new DomainException(ErrorCodes.OPTION_NETFLIX_NOT_ALLOWED);
                 }
             }
             case HD -> {
-                boolean isNetflixAdded = subscriptionToManage.getOptionsList().stream()
+                boolean isNetflixAdded = subscriptionDomainToManage.getOptionsList().stream()
                         .anyMatch(option -> option.getOptionType() == OptionType.NETFLIX);
 
                 if (!isNetflixAdded) {
@@ -120,7 +120,7 @@ public class SubscriptionService {
                 }
             }
             case MUSIC -> {
-                if (subscriptionToManage.getType() == SubscriptionType.FIX) {
+                if (subscriptionDomainToManage.getType() == SubscriptionType.FIX) {
                     log.warn(ErrorCodes.OPTION_MUSIC_NOT_ALLOWED);
                     throw new DomainException(ErrorCodes.OPTION_MUSIC_NOT_ALLOWED);
                 }

@@ -47,7 +47,7 @@ class SubscriptionControllerTest {
     void findAllSubscriptions_shouldReturn200WithEmptyList() throws Exception {
         when(subscriptionService.findAllSubscriptionsWithOptions()).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/itsf/subscription"))
+        mockMvc.perform(get("/api/itsf/subscriptions"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(0));
@@ -55,16 +55,16 @@ class SubscriptionControllerTest {
 
     @Test
     void findAllSubscriptions_shouldReturn200WithSubscriptions() throws Exception {
-        Subscription lSubscription = new Subscription();
-        lSubscription.setId(1L);
-        lSubscription.setClientId(1L);
-        lSubscription.setType(SubscriptionType.FIX);
-        lSubscription.setSubscriptionDateStart(LocalDateTime.now());
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setId(1L);
+        subscriptionDomain.setClientId(1L);
+        subscriptionDomain.setType(SubscriptionType.FIX);
+        subscriptionDomain.setSubscriptionDateStart(LocalDateTime.now());
 
         when(subscriptionService.findAllSubscriptionsWithOptions())
-                .thenReturn(Collections.singletonList(lSubscription));
+                .thenReturn(Collections.singletonList(subscriptionDomain));
 
-        mockMvc.perform(get("/api/itsf/subscription"))
+        mockMvc.perform(get("/api/itsf/subscriptions"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(1))
@@ -74,40 +74,40 @@ class SubscriptionControllerTest {
 
     @Test
     void newSubscription_shouldReturnError400WhenClientIdIsNull() throws Exception {
-        SubscriptionRequest lRequest = new SubscriptionRequest(null, SubscriptionType.MOBILE, null);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(null, SubscriptionType.MOBILE, null);
 
-        mockMvc.perform(post("/api/itsf/subscription")
+        mockMvc.perform(post("/api/itsf/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(lRequest)))
+                        .content(objectMapper.writeValueAsString(subscriptionRequest)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void newSubscription_shouldReturnError400WhenTypeIsNull() throws Exception {
-        SubscriptionRequest lRequest = new SubscriptionRequest(1L, null, null);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(1L, null, null);
 
-        mockMvc.perform(post("/api/itsf/subscription")
+        mockMvc.perform(post("/api/itsf/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(lRequest)))
+                        .content(objectMapper.writeValueAsString(subscriptionRequest)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void newSubscription_shouldReturn200WhenSuccess() throws Exception {
-        Subscription lSavedSubscription = new Subscription();
-        lSavedSubscription.setId(1L);
-        lSavedSubscription.setClientId(42L);
-        lSavedSubscription.setType(SubscriptionType.MOBILE);
-        lSavedSubscription.setSubscriptionDateStart(LocalDateTime.now());
+        Subscription savedSubscriptionDomain = new Subscription();
+        savedSubscriptionDomain.setId(1L);
+        savedSubscriptionDomain.setClientId(42L);
+        savedSubscriptionDomain.setType(SubscriptionType.MOBILE);
+        savedSubscriptionDomain.setSubscriptionDateStart(LocalDateTime.now());
 
         when(subscriptionService.addNewSubscription(any(Subscription.class)))
-                .thenReturn(lSavedSubscription);
+                .thenReturn(savedSubscriptionDomain);
 
-        SubscriptionRequest lRequest = new SubscriptionRequest(42L, SubscriptionType.MOBILE, null);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(42L, SubscriptionType.MOBILE, null);
 
-        mockMvc.perform(post("/api/itsf/subscription")
+        mockMvc.perform(post("/api/itsf/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(lRequest)))
+                        .content(objectMapper.writeValueAsString(subscriptionRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
@@ -118,13 +118,13 @@ class SubscriptionControllerTest {
 
     @Test
     void addOptionToExistingSubscription_shouldReturn400WhenOptionTypeIsInvalid() throws Exception {
-        mockMvc.perform(post("/api/itsf/subscription/1/option/INVALID_OPTION"))
+        mockMvc.perform(post("/api/itsf/subscriptions/1/options/INVALID_OPTION"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void addOptionToExistingSubscription_shouldReturn400WhenIdIsInvalid() throws Exception {
-        mockMvc.perform(post("/api/itsf/subscription/null//option/NETFLIX"))
+        mockMvc.perform(post("/api/itsf/subscriptions/null//options/NETFLIX"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -135,37 +135,37 @@ class SubscriptionControllerTest {
         when(subscriptionService.getSubscriptionById(99L))
                 .thenThrow(new DomainException("subscription.isNull"));
 
-        mockMvc.perform(post("/api/itsf/subscription/99/option/NETFLIX"))
+        mockMvc.perform(post("/api/itsf/subscriptions/99/options/NETFLIX"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("The subscription was not registered."));
     }
 
     @Test
     void addOptionToExistingSubscription_shouldReturn200WhenSuccess() throws Exception {
-        Option lOption = new Option();
-        lOption.setId(1L);
-        lOption.setOptionType(OptionType.NETFLIX);
-        lOption.setOptionSubDateStart(LocalDateTime.now());
+        Option optionDomain = new Option();
+        optionDomain.setId(1L);
+        optionDomain.setOptionType(OptionType.NETFLIX);
+        optionDomain.setOptionSubDateStart(LocalDateTime.now());
 
-        Subscription lSubscription = new Subscription();
-        lSubscription.setId(1L);
-        lSubscription.setClientId(42L);
-        lSubscription.setType(SubscriptionType.FIBER);
-        lSubscription.setSubscriptionDateStart(LocalDateTime.now());
-        lSubscription.setOptionList(List.of(lOption));
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setId(1L);
+        subscriptionDomain.setClientId(42L);
+        subscriptionDomain.setType(SubscriptionType.FIBER);
+        subscriptionDomain.setSubscriptionDateStart(LocalDateTime.now());
+        subscriptionDomain.setOptionList(List.of(optionDomain));
 
-        Subscription lUpdatedSubscription = new Subscription();
-        lUpdatedSubscription.setId(1L);
-        lUpdatedSubscription.setClientId(42L);
-        lUpdatedSubscription.setType(SubscriptionType.FIBER);
-        lUpdatedSubscription.setSubscriptionDateStart(LocalDateTime.now());
-        lUpdatedSubscription.setOptionList(List.of(lOption));
+        Subscription updatedSubscriptionDomain = new Subscription();
+        updatedSubscriptionDomain.setId(1L);
+        updatedSubscriptionDomain.setClientId(42L);
+        updatedSubscriptionDomain.setType(SubscriptionType.FIBER);
+        updatedSubscriptionDomain.setSubscriptionDateStart(LocalDateTime.now());
+        updatedSubscriptionDomain.setOptionList(List.of(optionDomain));
 
-        when(subscriptionService.getSubscriptionById(1L)).thenReturn(lSubscription);
-        when(subscriptionService.addOptionToExistingSubscription(lSubscription, OptionType.ROAMING))
-                .thenReturn(lUpdatedSubscription);
+        when(subscriptionService.getSubscriptionById(1L)).thenReturn(subscriptionDomain);
+        when(subscriptionService.addOptionsToExistingSubscription(subscriptionDomain, OptionType.ROAMING))
+                .thenReturn(updatedSubscriptionDomain);
 
-        mockMvc.perform(post("/api/itsf/subscription/1/option/ROAMING"))
+        mockMvc.perform(post("/api/itsf/subscriptions/1/options/ROAMING"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))

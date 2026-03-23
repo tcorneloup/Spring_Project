@@ -22,105 +22,105 @@ class SubscriptionDtoMapperTest {
     private static final LocalDateTime DATE = LocalDateTime.of(2026, 3, 10, 12, 30);
 
     @Test
-    void subscriptionRequestToDomain_shouldReturnNullWhenRequestIsNull() {
+    void subscriptionRequestToDomain_shouldReturnNullWhenSubscriptionRequestIsNull() {
         assertNull(SubscriptionDtoMapper.subscriptionRequestToDomain(null));
     }
 
     @Test
     void subscriptionRequestToDomain_shouldMapFieldsCorrectly() {
-        SubscriptionRequest request = new SubscriptionRequest(42L, SubscriptionType.MOBILE, null);
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(42L, SubscriptionType.MOBILE, null);
 
-        Subscription result = SubscriptionDtoMapper.subscriptionRequestToDomain(request);
+        Subscription subscriptionDomain = SubscriptionDtoMapper.subscriptionRequestToDomain(subscriptionRequest);
 
-        assertNotNull(result);
-        assertEquals(42L, result.getClientId());
-        assertEquals(SubscriptionType.MOBILE, result.getType());
-        assertNull(result.getId());
-        assertNull(result.getSubscriptionDateStart());
-        assertTrue(result.getOptionsList().isEmpty());
+        assertNotNull(subscriptionDomain);
+        assertEquals(42L, subscriptionDomain.getClientId());
+        assertEquals(SubscriptionType.MOBILE, subscriptionDomain.getType());
+        assertNull(subscriptionDomain.getId());
+        assertNull(subscriptionDomain.getSubscriptionDateStart());
+        assertTrue(subscriptionDomain.getOptionsList().isEmpty());
     }
 
     @Test
-    void subscriptionRequestToDomain_shouldMapOptionsCorrectly() {
+    void subscriptionRequestToDomain_shouldMapOptionsRequestCorrectly() {
         OptionRequest optionRequest = new OptionRequest(OptionType.NETFLIX, DATE);
-        SubscriptionRequest request = new SubscriptionRequest(42L, SubscriptionType.FIBER, List.of(optionRequest));
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(42L, SubscriptionType.FIBER, List.of(optionRequest));
 
-        Subscription result = SubscriptionDtoMapper.subscriptionRequestToDomain(request);
+        Subscription subscriptionDomain = SubscriptionDtoMapper.subscriptionRequestToDomain(subscriptionRequest);
 
-        assertEquals(1, result.getOptionsList().size());
-        Option option = result.getOptionsList().getFirst();
-        assertEquals(OptionType.NETFLIX, option.getOptionType());
-        assertEquals(DATE, option.getOptionSubDateStart());
+        assertEquals(1, subscriptionDomain.getOptionsList().size());
+        Option optionDomain = subscriptionDomain.getOptionsList().getFirst();
+        assertEquals(OptionType.NETFLIX, optionDomain.getOptionType());
+        assertEquals(DATE, optionDomain.getOptionSubDateStart());
     }
 
     @Test
     void subscriptionRequestToDomain_shouldHandleEmptyOptionsList() {
-        SubscriptionRequest request = new SubscriptionRequest(42L, SubscriptionType.FIX, Collections.emptyList());
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(42L, SubscriptionType.FIX, Collections.emptyList());
 
-        Subscription result = SubscriptionDtoMapper.subscriptionRequestToDomain(request);
+        Subscription subscriptionDomain = SubscriptionDtoMapper.subscriptionRequestToDomain(subscriptionRequest);
 
-        assertNotNull(result);
-        assertTrue(result.getOptionsList().isEmpty());
+        assertNotNull(subscriptionDomain);
+        assertTrue(subscriptionDomain.getOptionsList().isEmpty());
     }
 
     @Test
-    void optionRequestToDomain_shouldReturnNullWhenRequestIsNull() {
+    void optionRequestToDomain_shouldReturnNullWhenOptionRequestIsNull() {
         assertNull(SubscriptionDtoMapper.optionRequestToDomain(null));
     }
 
     @Test
     void optionRequestToDomain_shouldMapFieldsCorrectly() {
-        OptionRequest request = new OptionRequest(OptionType.ROAMING, DATE);
+        OptionRequest optionRequest = new OptionRequest(OptionType.ROAMING, DATE);
 
-        Option result = SubscriptionDtoMapper.optionRequestToDomain(request);
+        Option optionDomain = SubscriptionDtoMapper.optionRequestToDomain(optionRequest);
 
-        assertNotNull(result);
-        assertEquals(OptionType.ROAMING, result.getOptionType());
-        assertEquals(DATE, result.getOptionSubDateStart());
-        assertNull(result.getId());
+        assertNotNull(optionDomain);
+        assertEquals(OptionType.ROAMING, optionDomain.getOptionType());
+        assertEquals(DATE, optionDomain.getOptionSubDateStart());
+        assertNull(optionDomain.getId());
     }
 
     @Test
-    void subscriptionDomainToResponse_shouldReturnNullWhenSubscriptionIsNull() {
+    void subscriptionDomainToResponse_shouldReturnNullWhenSubscriptionDomainIsNull() {
         assertNull(SubscriptionDtoMapper.subscriptionDomainToResponse(null));
     }
 
     @Test
     void subscriptionDomainToResponse_shouldMapAllFieldsCorrectly() {
-        Subscription subscription = new Subscription();
-        subscription.setId(1L);
-        subscription.setClientId(42L);
-        subscription.setType(SubscriptionType.MOBILE);
-        subscription.setSubscriptionDateStart(DATE);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setId(1L);
+        subscriptionDomain.setClientId(42L);
+        subscriptionDomain.setType(SubscriptionType.MOBILE);
+        subscriptionDomain.setSubscriptionDateStart(DATE);
 
-        SubscriptionResponse result = SubscriptionDtoMapper.subscriptionDomainToResponse(subscription);
+        SubscriptionResponse subscriptionResponse = SubscriptionDtoMapper.subscriptionDomainToResponse(subscriptionDomain);
 
-        assertNotNull(result);
-        assertEquals(1L, result.id());
-        assertEquals(42L, result.clientId());
-        assertEquals(SubscriptionType.MOBILE, result.type());
-        assertEquals(DATE, result.subscriptionDateStart());
-        assertTrue(result.options().isEmpty());
+        assertNotNull(subscriptionResponse);
+        assertEquals(1L, subscriptionResponse.id());
+        assertEquals(42L, subscriptionResponse.clientId());
+        assertEquals(SubscriptionType.MOBILE, subscriptionResponse.type());
+        assertEquals(DATE, subscriptionResponse.subscriptionDateStart());
+        assertTrue(subscriptionResponse.options().isEmpty());
     }
 
     @Test
-    void subscriptionDomainToResponse_shouldMapOptionsCorrectly() {
-        Option option = new Option();
-        option.setId(10L);
-        option.setOptionType(OptionType.HD);
-        option.setOptionSubDateStart(DATE);
+    void subscriptionDomainToResponse_shouldMapOptionsDomainCorrectly() {
+        Option optionDomain = new Option();
+        optionDomain.setId(10L);
+        optionDomain.setOptionType(OptionType.HD);
+        optionDomain.setOptionSubDateStart(DATE);
 
-        Subscription subscription = new Subscription();
-        subscription.setId(1L);
-        subscription.setClientId(42L);
-        subscription.setType(SubscriptionType.FIBER);
-        subscription.setSubscriptionDateStart(DATE);
-        subscription.setOptionList(List.of(option));
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setId(1L);
+        subscriptionDomain.setClientId(42L);
+        subscriptionDomain.setType(SubscriptionType.FIBER);
+        subscriptionDomain.setSubscriptionDateStart(DATE);
+        subscriptionDomain.setOptionList(List.of(optionDomain));
 
-        SubscriptionResponse result = SubscriptionDtoMapper.subscriptionDomainToResponse(subscription);
+        SubscriptionResponse subscriptionResponse = SubscriptionDtoMapper.subscriptionDomainToResponse(subscriptionDomain);
 
-        assertEquals(1, result.options().size());
-        OptionResponse optionResponse = result.options().getFirst();
+        assertEquals(1, subscriptionResponse.options().size());
+        OptionResponse optionResponse = subscriptionResponse.options().getFirst();
         assertEquals(10L, optionResponse.id());
         assertEquals(OptionType.HD, optionResponse.optionType());
         assertEquals(DATE, optionResponse.optionSubDateStart());
@@ -128,16 +128,16 @@ class SubscriptionDtoMapperTest {
 
     @Test
     void subscriptionDomainToResponse_shouldHandleNullOptionsList() {
-        Subscription subscription = new Subscription();
-        subscription.setId(1L);
-        subscription.setClientId(42L);
-        subscription.setType(SubscriptionType.FIX);
-        subscription.setOptionList(null);
+        Subscription subscriptionDomain = new Subscription();
+        subscriptionDomain.setId(1L);
+        subscriptionDomain.setClientId(42L);
+        subscriptionDomain.setType(SubscriptionType.FIX);
+        subscriptionDomain.setOptionList(null);
 
-        SubscriptionResponse result = SubscriptionDtoMapper.subscriptionDomainToResponse(subscription);
+        SubscriptionResponse subscriptionResponse = SubscriptionDtoMapper.subscriptionDomainToResponse(subscriptionDomain);
 
-        assertNotNull(result);
-        assertTrue(result.options().isEmpty());
+        assertNotNull(subscriptionResponse);
+        assertTrue(subscriptionResponse.options().isEmpty());
     }
 
     @Test
@@ -147,17 +147,17 @@ class SubscriptionDtoMapperTest {
 
     @Test
     void optionDomainToResponse_shouldMapAllFieldsCorrectly() {
-        Option option = new Option();
-        option.setId(5L);
-        option.setOptionType(OptionType.MUSIC);
-        option.setOptionSubDateStart(DATE);
+        Option optionDomain = new Option();
+        optionDomain.setId(5L);
+        optionDomain.setOptionType(OptionType.MUSIC);
+        optionDomain.setOptionSubDateStart(DATE);
 
-        OptionResponse result = SubscriptionDtoMapper.optionDomainToResponse(option);
+        OptionResponse optionResponse = SubscriptionDtoMapper.optionDomainToResponse(optionDomain);
 
-        assertNotNull(result);
-        assertEquals(5L, result.id());
-        assertEquals(OptionType.MUSIC, result.optionType());
-        assertEquals(DATE, result.optionSubDateStart());
+        assertNotNull(optionResponse);
+        assertEquals(5L, optionResponse.id());
+        assertEquals(OptionType.MUSIC, optionResponse.optionType());
+        assertEquals(DATE, optionResponse.optionSubDateStart());
     }
 }
 
