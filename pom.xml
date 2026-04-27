@@ -8,11 +8,11 @@
 		<version>4.0.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>Recruitement</groupId>
-	<artifactId>ITSF</artifactId>
+	<groupId>Project</groupId>
+	<artifactId>spring</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ITSF</name>
-	<description>Project for ITSF recruitement</description>
+	<name>Spring</name>
+	<description>Project Spring</description>
 	<url/>
 	<licenses>
 		<license/>
